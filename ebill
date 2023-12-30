@@ -1,0 +1,55 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ElectricityBill {
+
+    address public owner;
+    mapping(address => uint256) public unpaidBills;
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not the contract owner");
+        _;
+    }
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    function payBill(uint256 ) external payable {
+
+        address payer = msg.sender;
+        uint256 unpaidBill = unpaidBills[payer];
+
+        require(msg.sender == owner, "Only the contract owner can pay the bill");
+
+
+        
+        if (msg.value > unpaidBill) {
+            payable(payer).transfer(msg.value - unpaidBill);
+        }
+
+       
+        unpaidBills[payer] = 0;
+    }
+
+    function generateBill(address customer, uint256 consumedUnits) external onlyOwner {
+        
+        assert(consumedUnits >= 10);
+
+        uint256 rate = 5; // Rate per kilowatt-hour
+        uint256 billAmount = consumedUnits * rate;
+
+       
+        require(billAmount > 0, "Generated bill amount should be greater than zero");
+
+        
+        if (consumedUnits > 1000) {
+            billAmount += 50;
+            unpaidBills[customer] = billAmount;
+
+            revert("Maximum supply is 1000 units please enter a valid units");
+        } else {
+            unpaidBills[customer] = billAmount;
+        }
+    }
+}
