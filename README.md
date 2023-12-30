@@ -1,4 +1,4 @@
-# Electricity Bill Smart Contract Readme
+# Electricity Bill 
 
 ## Overview
 
